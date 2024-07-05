@@ -3,7 +3,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import (MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, CarouselColumn,
                             CarouselTemplate, MessageAction, URIAction, ImageCarouselColumn, ImageCarouselTemplate,
-                            ImageSendMessage)
+                            ImageSendMessage,ConfirmTemplate)
 import os
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
@@ -32,9 +32,25 @@ def callback():
 
 @line_handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    # line_bot_api.reply_message(
+    #     event.reply_token,
+    #     TextSendMessage(text=event.message.text))
+
+    if event.message.text == 'confirm':
+        confirm_template = TemplateSendMessage(
+            alt_text = 'confirm template',
+            template = ConfirmTemplate(
+                text = 'drink coffee?',
+                actions = [
+                    MessageAction(
+                        label = 'yes',
+                        text = 'yes'),
+                    MessageAction(
+                        label = 'no',
+                        text = 'no')]
+                )
+            )
+        line_bot_api.reply_message(event.reply_token, confirm_template)
 
 if __name__ == "__main__":
     app.run()
